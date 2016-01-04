@@ -42,6 +42,7 @@ in_x_plane.axis=(x*np.cos(phi*0.01745),0,0)
 in_y_plane.axis=(0,y,0)
 in_z_plane.axis=(0,0,x*np.sin(phi*0.01745))
 print("Initial x,y,z: %.2f,%.2f,%.2f" % (in_x_plane.axis[0], in_y_plane.axis[1], in_z_plane.axis[2]))
+print("l1_ind.length = %.2f, l2_ind.length = %.2f" % (l1_ind.length, l2_ind.length))
 
 #draw initial compact disc
 disc=cylinder(pos=(in_x_plane.axis[0],in_y_plane.axis[1]-3,in_z_plane.axis[2]),axis=(0,0.12,0),radius=6)
@@ -125,3 +126,4 @@ while (1==1):
     label_2.text='Clamp status = '+clamp
     disc.pos=(in_x_plane.axis[0],in_y_plane.axis[1]-3,in_z_plane.axis[2])
     print("x,y,z: %.2f,%.2f,%.2f" % (in_x_plane.axis[0], in_y_plane.axis[1], in_z_plane.axis[2]))
+    print("l1_ind.length = %.2f, l2_ind.length = %.2f" % (l1_ind.length, l2_ind.length))
