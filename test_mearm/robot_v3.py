@@ -5,8 +5,12 @@ from visual import *
 import numpy as np
 
 #define dimensions for the MeArm
-l1 = 8.5 #length of link 1 in cm
-l2 = 8.5 #length of link 2 in cm
+linkage_1 = 8.5 #length of link 1 in cm
+linkage_2 = 8.5 #length of link 2 in cm
+
+x_offset=1;
+y_offset=2;
+z_offset=0;
 
 #Create virtual environment:
 scene = display(title='Robot movements', width=600, height=600, center=(8,4,0)) #set up the scene
@@ -18,8 +22,8 @@ neg_z_axis= arrow(pos=(0,0,0), axis=(0,0,15), shaftwidth=0.1, headwidth=0.3)
 
 #Indicators for the target, link 1 and link 2 respectively
 #indicator = arrow(pos=(0,0,0), axis=(10,10,0), shaftwidth=0.2, headwidth=0.3, color=color.yellow)
-l1_ind = arrow(pos=(0,0,0), axis=(2.65,7.64,0), shaftwidth=0.2, headwidth=0.3, color=color.red)
-l2_ind = arrow(pos=(2.65,7.64,0), axis=(7.3,2.3,0), shaftwidth=0.2, headwidth=0.3, color=color.green)
+linkage_1_ind = arrow(pos=(0+x_offset,0+y_offset,0+z_offset), axis=(0,linkage_1,0), shaftwidth=0.2, headwidth=0.3, color=color.red)
+linkage_2_ind = arrow(pos=(0+x_offset,linkage_1+y_offset,0+z_offset), axis=(linkage_2,0,0), shaftwidth=0.2, headwidth=0.3, color=color.green)
 #Labels to show how to move the robot
 label_1=label(pos=(8,18,0), text='Use arrows to move in plane. Use a and d to rotate. Use w and s to open/close the clamp')
 label_2=label(pos=(8,-8,0), text='Clamp status = Close')
@@ -32,8 +36,8 @@ cabin = box(pos=(0,3,0), length=4,height=4, width=4, opacity=0.5)
 stilts = box(pos=(0,0.5,0), length=2,height=1, width=2, opacity=0.7)
 
 #Initial position
-x=10
-y=10
+x=0+x_offset+linkage_2
+y=0+y_offset+linkage_1
 phi=0 #angle for base rotation
 clamp = 'Close' #Clamp is close
 
@@ -44,7 +48,7 @@ in_x_plane.axis=(x*np.cos(phi*0.01745),0,0)
 in_y_plane.axis=(0,y,0)
 in_z_plane.axis=(0,0,x*np.sin(phi*0.01745))
 print("Initial x,y,z: %.2f,%.2f,%.2f" % (in_x_plane.axis[0], in_y_plane.axis[1], in_z_plane.axis[2]))
-print("l1_ind.length = %.2f, l2_ind.length = %.2f" % (l1_ind.length, l2_ind.length))
+print("linkage_1_ind.length = %.2f, linkage_2_ind.length = %.2f" % (linkage_1_ind.length, linkage_2_ind.length))
 
 #draw initial compact disc
 disc=cylinder(pos=(in_x_plane.axis[0]+3,in_y_plane.axis[1]-3,in_z_plane.axis[2]),axis=(0,0.12,0),radius=6)
@@ -122,7 +126,7 @@ while (1==1):
 
     #Calculate the distance to the target and the angle to the x axis
     T = np.sqrt(x*x+y*y) #Distance to target
-    if l1+l2<T+0.5: #Loop to prevent targets out of range
+    if linkage_1+linkage_2<T+0.5: #Loop to prevent targets out of range
         print 'Position cannot be reached, reseting...'
         x=10
         y=10
@@ -130,22 +134,25 @@ while (1==1):
     theta = np.arctan2(y,x)
 
     #Calculate the Area of the triangle using Heron's formula
-    s=(l1+l2+T)/2 #Calculate the semiperimeter
-    A= np.sqrt(s*(s-l1)*(s-l2)*(s-T)) #Area of the triangle 2-link arm
+    s=(linkage_1+linkage_2+T)/2 #Calculate the semiperimeter
+    A= np.sqrt(s*(s-linkage_1)*(s-linkage_2)*(s-T)) #Area of the triangle 2-link arm
     
     #Now we calculate the angles
-    alpha = np.arcsin((2*A)/(l1*T))
-    gamma = np.arcsin((2*A)/(T*l2))
-    beta = np.arcsin((2*A)/(l1*l2))
+    alpha = np.arcsin((2*A)/(linkage_1*T))
+    gamma = np.arcsin((2*A)/(T*linkage_2))
+    beta = np.arcsin((2*A)/(linkage_1*linkage_2))
     if beta>0.5:
         beta = np.pi-alpha-gamma     
-    ang=3.141592+alpha+theta+beta #Correct angle from the l1 indicator
+    ang=3.141592+alpha+theta+beta #Correct angle from the linkage_1 indicator
 
     #Update the indicators
     #indicator.axis=(x*np.cos(phi*0.01745),y,x*np.sin(phi*0.01745)) #calculate the new axis of the indicator
-    l1_ind.axis=(l1*np.cos(alpha+theta)*np.cos(phi*0.01745),l1*np.sin(alpha+theta),l1*np.cos(alpha+theta)*np.sin(phi*0.01745)) #calculate the new axis of l1
-    l2_ind.pos=(l1*np.cos(alpha+theta)*np.cos(phi*0.01745),l1*np.sin(alpha+theta),l1*np.cos(alpha+theta)*np.sin(phi*0.01745)) #calculate new origin for l2
-    l2_ind.axis=(l2*np.cos(ang)*np.cos(phi*0.01745),l2*np.sin(ang),l2*np.cos(ang)*np.sin(phi*0.01745)) #Calculate new axis for l2
+    linkage_1_x=linkage_1*np.cos(alpha+theta)*np.cos(phi*0.01745)
+    linkage_1_y=linkage_1*np.sin(alpha+theta)
+    linkage_1_z=linkage_1*np.cos(alpha+theta)*np.sin(phi*0.01745) #calculate new origin for linkage_2
+    linkage_1_ind.axis=(linkage_1_x+x_offset,linkage_1_y+y_offset,linkage_1_z+z_offset)
+    linkage_2_ind.pos=(linkage_1*np.cos(alpha+theta)*np.cos(phi*0.01745),linkage_1*np.sin(alpha+theta),linkage_1*np.cos(alpha+theta)*np.sin(phi*0.01745)) #calculate new origin for linkage_2
+    linkage_2_ind.axis=(linkage_2*np.cos(ang)*np.cos(phi*0.01745),linkage_2*np.sin(ang),linkage_2*np.cos(ang)*np.sin(phi*0.01745)) #Calculate new axis for linkage_2
     in_x_plane.pos=(0,0,x*np.sin(phi*0.01745))
     in_y_plane.pos=(x*np.cos(phi*0.01745),0,x*np.sin(phi*0.01745))
     in_z_plane.pos=(x*np.cos(phi*0.01745),0,0)
@@ -155,4 +162,4 @@ while (1==1):
     label_2.text='Clamp status = '+clamp
     disc.pos=(in_x_plane.axis[0]+3,in_y_plane.axis[1]-3,in_z_plane.axis[2])
     print("x,y,z: %.2f,%.2f,%.2f" % (in_x_plane.axis[0], in_y_plane.axis[1], in_z_plane.axis[2]))
-    print("l1_ind.length = %.2f, l2_ind.length = %.2f" % (l1_ind.length, l2_ind.length))
+    print("linkage_1_ind.length = %.2f, linkage_2_ind.length = %.2f" % (linkage_1_ind.length, linkage_2_ind.length))
