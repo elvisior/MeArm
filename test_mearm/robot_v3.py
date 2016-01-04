@@ -45,11 +45,19 @@ print("Initial x,y,z: %.2f,%.2f,%.2f" % (in_x_plane.axis[0], in_y_plane.axis[1],
 print("l1_ind.length = %.2f, l2_ind.length = %.2f" % (l1_ind.length, l2_ind.length))
 
 #draw initial compact disc
-disc=cylinder(pos=(in_x_plane.axis[0],in_y_plane.axis[1]-3,in_z_plane.axis[2]),axis=(0,0.12,0),radius=6)
-src_base=cylinder(pos=(1,0,9),axis=(0,0.12,0),radius=6, color=color.green)
-dest_base=cylinder(pos=(1,0,-9),axis=(0,0.12,0),radius=6, color=color.red)
-src_spindle=cylinder(pos=(1,0,9),axis=(0,5,0),radius=0.7, color=color.green)
-dest_spindle=cylinder(pos=(1,0,-9),axis=(0,5,0),radius=0.7, color=color.red)
+disc=cylinder(pos=(in_x_plane.axis[0]+3,in_y_plane.axis[1]-3,in_z_plane.axis[2]),axis=(0,0.12,0),radius=6)
+
+#draw source and destination spindles
+#dest
+dst_base=cylinder(pos=(1,0,9),axis=(0,0.5,0),radius=6.3, color=color.green)
+dst_spindle=cylinder(pos=(1,0,9),axis=(0,5,0),radius=0.7, color=color.green)
+
+#source
+source_base=cylinder(pos=(1,0,-9),axis=(0,0.5,0),radius=6.3, color=color.red)
+source_spindle=cylinder(pos=(1,0,-9),axis=(0,5,0),radius=0.7, color=color.red)
+#put some cd's on the spindle
+for x in range(0,30):
+    source_cds=cylinder(pos=(1,(0.5+(x*(0.12 + 0.01))),-9),axis=(0,0.12,0),radius=6)
 
 #draw cdrom
 cdrom = box(pos=(30,2.14,0), width=14.9, height=4.28, length=20, color=color.blue)
@@ -57,7 +65,7 @@ tray = box(pos=(13.75,3,0), width=13.4, height=1.5, length=13.25, color=color.gr
 
 #now we made an infinite while loop to keep the program running
 while (1==1):
-    rate(120) #refresh rate required for VPython
+    rate(60) #refresh rate required for VPython
     ev = scene.waitfor('keydown')
     if ev.key == 'up':
         y = y + offset
@@ -85,6 +93,12 @@ while (1==1):
     elif ev.key == 'w':
         print 'Opening clamp...'
         clamp = 'Open'
+    elif ev.key == 'o':
+        #open the cdrom
+	tray.pos=(13.75,3,0)
+    elif ev.key == 'c':
+        #close the cdrom
+	tray.pos=(13.75+12.75,3,0)
     elif ev.key == 's':
         print 'Closing clamp...'
         clamp = 'Close'
@@ -130,6 +144,6 @@ while (1==1):
     in_y_plane.axis=(0,y,0)
     in_z_plane.axis=(0,0,x*np.sin(phi*0.01745))
     label_2.text='Clamp status = '+clamp
-    disc.pos=(in_x_plane.axis[0],in_y_plane.axis[1]-3,in_z_plane.axis[2])
+    disc.pos=(in_x_plane.axis[0]+3,in_y_plane.axis[1]-3,in_z_plane.axis[2])
     print("x,y,z: %.2f,%.2f,%.2f" % (in_x_plane.axis[0], in_y_plane.axis[1], in_z_plane.axis[2]))
     print("l1_ind.length = %.2f, l2_ind.length = %.2f" % (l1_ind.length, l2_ind.length))
