@@ -3,6 +3,7 @@
 #import required libraries
 from visual import *
 import numpy as np
+import sys
 
 #define dimensions for the MeArm
 linkage_1 = 8.5 #length of link 1 in cm
@@ -24,9 +25,15 @@ neg_z_axis= arrow(pos=(0,0,0), axis=(0,0,15), shaftwidth=0.1, headwidth=0.3)
 #indicator = arrow(pos=(0,0,0), axis=(10,10,0), shaftwidth=0.2, headwidth=0.3, color=color.yellow)
 linkage_1_ind = arrow(pos=(0+x_offset,0+y_offset,0+z_offset), axis=(0,linkage_1,0), shaftwidth=0.2, headwidth=0.3, color=color.red)
 linkage_2_ind = arrow(pos=(0+x_offset,linkage_1+y_offset,0+z_offset), axis=(linkage_2,0,0), shaftwidth=0.2, headwidth=0.3, color=color.green)
+
 #Labels to show how to move the robot
 label_1=label(pos=(8,18,0), text='Use arrows to move in plane. Use a and d to rotate. Use w and s to open/close the clamp')
 label_2=label(pos=(8,-8,0), text='Clamp status = Close')
+label_x=label(pos=(16,0,0), text='x')
+label_x=label(pos=(0,16,0), text='y')
+label_z=label(pos=(0,0,16), text='z')
+
+
 #Labels to improve the visualization of the position of the arm
 in_x_plane=arrow(pos=(0,0,0), axis=(10,0,0), shaftwidth=0.1, headwidth=0.1, color=color.blue, opacity=0.3)
 in_y_plane=arrow(pos=(0,0,0), axis=(0,10,0), shaftwidth=0.1, headwidth=0.1, color=color.cyan, opacity=0.3)
@@ -48,6 +55,7 @@ in_x_plane.axis=(x*np.cos(phi*0.01745),0,0)
 in_y_plane.axis=(0,y,0)
 in_z_plane.axis=(0,0,x*np.sin(phi*0.01745))
 print("Initial x,y,z: %.2f,%.2f,%.2f" % (in_x_plane.axis[0], in_y_plane.axis[1], in_z_plane.axis[2]))
+label_target=label(pos=(in_x_plane.axis[0], in_y_plane.axis[1]+1, in_z_plane.axis[2]), text=("Target: %.2f,%.2f,%.2f" % (in_x_plane.axis[0], in_y_plane.axis[1], in_z_plane.axis[2])))
 print("linkage_1_ind.length = %.2f, linkage_2_ind.length = %.2f" % (linkage_1_ind.length, linkage_2_ind.length))
 
 #draw initial compact disc
@@ -96,7 +104,7 @@ while (1==1):
             phi = 90
 	cabin_degrees=cabin_degrees+degrees;
     	cabin.rotate(angle=radians(-degrees), axis=(0,1,0), origin=(0,0,0))
-    elif ev.key == 'q':
+    elif ev.key == 'r':
         print 'Going to initial position...'
         x=10
         y=10
@@ -123,6 +131,8 @@ while (1==1):
 	offset = offset / 2
 	degrees = degrees / 2
 	print "offset = " + repr(offset) + ", degrees = " + repr(degrees)
+    elif ev.key == 'z':
+        exit()
 
     #Calculate the distance to the target and the angle to the x axis
     T = np.sqrt(x*x+y*y) #Distance to target
@@ -147,19 +157,31 @@ while (1==1):
 
     #Update the indicators
     #indicator.axis=(x*np.cos(phi*0.01745),y,x*np.sin(phi*0.01745)) #calculate the new axis of the indicator
-    linkage_1_x=linkage_1*np.cos(alpha+theta)*np.cos(phi*0.01745)
-    linkage_1_y=linkage_1*np.sin(alpha+theta)
-    linkage_1_z=linkage_1*np.cos(alpha+theta)*np.sin(phi*0.01745) #calculate new origin for linkage_2
-    linkage_1_ind.axis=(linkage_1_x+x_offset,linkage_1_y+y_offset,linkage_1_z+z_offset)
-    linkage_2_ind.pos=(linkage_1*np.cos(alpha+theta)*np.cos(phi*0.01745),linkage_1*np.sin(alpha+theta),linkage_1*np.cos(alpha+theta)*np.sin(phi*0.01745)) #calculate new origin for linkage_2
+    #calculate new origin for linkage_2
+    linkage_1_tip_x=linkage_1*np.cos(alpha+theta)*np.cos(phi*0.01745)
+    linkage_1_tip_y=linkage_1*np.sin(alpha+theta)
+    linkage_1_tip_z=linkage_1*np.cos(alpha+theta)*np.sin(phi*0.01745)
+    linkage_1_ind.axis=(linkage_1_tip_x,linkage_1_tip_y,linkage_1_tip_z)
+
+    linkage_2_x=x_offset+(linkage_1*np.cos(alpha+theta)*np.cos(phi*0.01745))
+    linkage_2_y=y_offset+(linkage_1*np.sin(alpha+theta))
+    linkage_2_z=z_offset+(linkage_1*np.cos(alpha+theta)*np.sin(phi*0.01745))
+    linkage_2_ind.pos=(linkage_2_x,linkage_2_y,linkage_2_z) #calculate new origin for linkage_2
+
     linkage_2_ind.axis=(linkage_2*np.cos(ang)*np.cos(phi*0.01745),linkage_2*np.sin(ang),linkage_2*np.cos(ang)*np.sin(phi*0.01745)) #Calculate new axis for linkage_2
+
     in_x_plane.pos=(0,0,x*np.sin(phi*0.01745))
     in_y_plane.pos=(x*np.cos(phi*0.01745),0,x*np.sin(phi*0.01745))
     in_z_plane.pos=(x*np.cos(phi*0.01745),0,0)
     in_x_plane.axis=(x*np.cos(phi*0.01745),0,0)
     in_y_plane.axis=(0,y,0)
     in_z_plane.axis=(0,0,x*np.sin(phi*0.01745))
+
     label_2.text='Clamp status = '+clamp
+
     disc.pos=(in_x_plane.axis[0]+3,in_y_plane.axis[1]-3,in_z_plane.axis[2])
+
     print("x,y,z: %.2f,%.2f,%.2f" % (in_x_plane.axis[0], in_y_plane.axis[1], in_z_plane.axis[2]))
+    label_target.pos=(in_x_plane.axis[0], in_y_plane.axis[1]+1, in_z_plane.axis[2])
+    label_target.text=("Target: %.2f,%.2f,%.2f" % (in_x_plane.axis[0], in_y_plane.axis[1], in_z_plane.axis[2]))
     print("linkage_1_ind.length = %.2f, linkage_2_ind.length = %.2f" % (linkage_1_ind.length, linkage_2_ind.length))
