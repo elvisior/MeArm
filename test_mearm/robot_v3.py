@@ -49,6 +49,9 @@ disc=cylinder(pos=(in_x_plane.axis[0],in_y_plane.axis[1]-3,in_z_plane.axis[2]),a
 src=cylinder(pos=(1,0,9),axis=(0,0.12,0),radius=6, color=color.green)
 dest=cylinder(pos=(1,0,-9),axis=(0,0.12,0),radius=6, color=color.red)
 
+#draw cdrom
+cdrom = box(pos=(30,2.14,0), width=14.9, height=4.28, length=20, color=color.blue)
+
 #now we made an infinite while loop to keep the program running
 while (1==1):
     rate(120) #refresh rate required for VPython
