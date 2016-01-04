@@ -28,7 +28,8 @@ in_x_plane=arrow(pos=(0,0,0), axis=(10,0,0), shaftwidth=0.1, headwidth=0.1, colo
 in_y_plane=arrow(pos=(0,0,0), axis=(0,10,0), shaftwidth=0.1, headwidth=0.1, color=color.cyan, opacity=0.3)
 in_z_plane=arrow(pos=(0,0,0), axis=(0,0,10), shaftwidth=0.1, headwidth=0.1, color=color.green, opacity=0.3)
 
-cabin = box(pos=(0,2,0), length=4,height=4, width=4, opacity=0.5)
+cabin = box(pos=(0,3,0), length=4,height=4, width=4, opacity=0.5)
+stilts = box(pos=(0,0.5,0), length=2,height=1, width=2, opacity=0.7)
 
 #Initial position
 x=10
